@@ -1,0 +1,104 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/local/Dockerfile
+    working_dir: /code
+    command: python manage.py runserver 0.0.0.0:8000
+    container_name: app
+    volumes:
+      - ./src:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      celery:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+    env_file:
+      - .envs/local/.env
+
+  celery:
+    build:
+      context: .
+      dockerfile: docker/app/local/Dockerfile
+    command: celery -A example_app worker -l info
+    container_name: celery
+    working_dir: /code
+    volumes:
+      - ./src:/code
+    depends_on:
+      - redis
+    env_file:
+      - .envs/local/.env
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: docker/app/local/Dockerfile
+    command: celery -A example_app beat -l info
+    container_name: celery-beat
+    working_dir: /code
+    volumes:
+      - ./src:/code
+    depends_on:
+      - redis
+    env_file:
+      - .envs/local/.env
+
+  redis:
+    build:
+      context: .
+      dockerfile: docker/redis/local/Dockerfile
+    container_name: redis
+
+  flower:
+    build:
+      context: .
+      dockerfile: docker/app/local/Dockerfile
+    command: celery -A example_app --broker=redis://redis:6379/0 flower --port=5555 --url_prefix=secret-flower
+    container_name: flower
+    working_dir: /code
+    volumes:
+      - ./src:/code
+    expose:
+      - 5555
+    depends_on:
+      - redis
+      - celery
+    env_file:
+      - .envs/local/.env
+
+  postgres:
+    build:
+      context: .
+      dockerfile: docker/db/local/Dockerfile
+    container_name: postgres
+    env_file:
+      - .envs/local/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 1s
+      timeout: 10s
+      retries: 10
+
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/local/Dockerfile
+    container_name: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+
+volumes:
+  postgres_data:

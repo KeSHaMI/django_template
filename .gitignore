@@ -1,0 +1,4 @@
+venv
+src/static
+src/celerybeat-schedule
+.idea
