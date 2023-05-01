@@ -3,7 +3,7 @@
 I'm tired of setting up django projects for some pet-projects,
 and to struggle every time with some infrastructure issues.
 
-So I decided to make one flexible template for django+postgres+redis+celery projects. 
+So I decided to make one flexible template for django+postgres+redis+celery projects.
 
 
 # First run
