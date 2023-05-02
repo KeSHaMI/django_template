@@ -24,9 +24,12 @@ local-build:
 local-start:
 	docker compose -f local.compose.yml up -d
 
+local-down:
+	docker compose -f local.compose.yml down
+
 local-reboot:
 	make local-build
-	docker compose -f local.compose.yml down
+	make local-down
 	make local-start
 
 celery-reboot:
