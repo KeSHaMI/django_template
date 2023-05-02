@@ -2,7 +2,6 @@ setup:
 	sudo sh scripts/update_hosts.sh
 	make local-build
 	make local-start
-	make django-manage cmd=collectstatic
 	make django-init
 	sh scripts/setup_completed_message.sh
 
@@ -11,6 +10,7 @@ test:
 	make django-manage cmd="test -t ."
 
 django-init:
+	make django-manage cmd=collectstatic
 	make django-manage cmd=makemigrations
 	make django-manage cmd=migrate
 	make django-manage cmd=createsuperuser
