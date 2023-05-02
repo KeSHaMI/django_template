@@ -16,7 +16,7 @@ django-init:
 	make django-manage cmd=createsuperuser
 
 django-manage:
-	docker exec -ti app python manage.py $(cmd)
+	docker exec -ti django-template-app python manage.py $(cmd)
 
 local-build:
 	DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose -f local.compose.yml build
