@@ -5,7 +5,7 @@ from celery import Celery
 from django.apps import apps
 
 # Set the default Django settings module for the 'celery' program.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_template.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "conf.settings")
 
 app = Celery("example_app")
 
